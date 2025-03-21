@@ -27,7 +27,7 @@ jobs:
           - RUNNER: ubuntu-latest
             PARAM: false
             PARAM_NAME: something
-    uses: .github/workflows/common.yml
+    uses: ./.github/workflows/common.yml
     with:
       PARAM: ${{ matrix.PARAM }}
       PARAM_NAME: ${{ matrix.PARAM_NAME }}
