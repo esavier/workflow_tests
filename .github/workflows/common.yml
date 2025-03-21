@@ -1,0 +1,55 @@
+name: DataLayer Service Check & Build
+
+on:
+  workflow_dispatch:
+    inputs:
+      PARAM:
+        required: true
+        type: boolean
+      PARAM_NAME:
+        required: true
+        type: string
+      RUNNER:
+        required: true
+        type: string
+
+jobs:
+  # use weekly cache key
+  # keeping cache for ony build is pointless
+  # for that we need to check current date so taht we can compose cache key later
+  datetime:
+    runs-on: ${{ inputs.RUNNER }}
+    outputs:
+      datetime_year: ${{ steps.datetime.outputs.year }}
+      datetime_month: ${{ steps.datetime.outputs.month }}
+      datetime_week: ${{ steps.datetime.outputs.week }}
+      datetime_day: ${{ steps.datetime.outputs.day }}
+      datetime_hour: ${{ steps.datetime.outputs.hour }}
+      datetime_minute: ${{ steps.datetime.outputs.minute }}
+      datetime_second: ${{ steps.datetime.outputs.second }}
+    steps:
+      - name: Set datetime
+        id: datetime
+        run: |
+          echo "::set-output name=year::$(date +%Y)"
+          echo "::set-output name=month::$(date +%m)"
+          echo "::set-output name=week::$(date +%V)"
+          echo "::set-output name=day::$(date +%d)"
+          echo "::set-output name=hour::$(date +%H)"
+          echo "::set-output name=minute::$(date +%M)"
+          echo "::set-output name=second::$(date +%S)"
+
+
+  compilation-tests:
+    runs-on: ${{ inputs.RUNNER }}
+    needs: [datetime]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.BUILD_SSH_KEY }}
+      - name: printout
+        run: |
+              echo "PARAM: ${{ inputs.PARAM }}"
+              echo "PARAM_NAME: ${{ inputs.PARAM_NAME }}"
+              echo "datetime_year: ${{ needs.datetime.outputs.datetime_year }}"
