@@ -18,6 +18,7 @@ jobs:
   build-and-check:
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: true
       matrix:
         include:
           - RUNNER: ubuntu-latest
@@ -26,15 +27,8 @@ jobs:
           - RUNNER: ubuntu-latest
             PARAM: false
             PARAM_NAME: something
-    steps:
-      - uses: actions/checkout@v4
-      - uses: webfactory/ssh-agent@v0.9.0
-        with:
-          ssh-private-key: ${{ secrets.BUILD_SSH_KEY }}
-      - name: Trigger secondary workflow
-        run: |
-          curl -X POST \
-            -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
-            -H "Accept: application/vnd.github+json" \
-            https://api.github.com/repos/${{ github.repository }}/actions/workflows/common.yml/dispatches \
-            -d '{"ref":"${{ github.head_ref }}","inputs":{"PARAM":"${{ matrix.PARAM }}","PARAM_NAME":"${{ matrix.PARAM_NAME }}, "RUNNER":"${{ matrix.RUNNER }}"}}'
+    uses: .github/workflows/common.yml
+    with:
+      PARAM: ${{ matrix.PARAM }}
+      PARAM_NAME: ${{ matrix.PARAM_NAME }}
+      RUNNER: ${{ matrix.RUNNER }}
