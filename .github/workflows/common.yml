@@ -39,7 +39,6 @@ jobs:
           echo "::set-output name=minute::$(date +%M)"
           echo "::set-output name=second::$(date +%S)"
 
-
   compilation-tests:
     runs-on: ${{ inputs.RUNNER }}
     needs: [datetime]
