@@ -1,7 +1,7 @@
 name: DataLayer Service Check & Build
 
 on:
-  workflow_dispatch:
+  workflow_call:
     inputs:
       PARAM:
         required: true
